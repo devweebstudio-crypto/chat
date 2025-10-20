@@ -1,0 +1,26 @@
+name: Expire Inactive Users
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # every 5 minutes (safe default)
+  workflow_dispatch: {}
+
+jobs:
+  expire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci || npm i node-fetch@2
+
+      - name: Run expire RPC
+        env:
+          SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+        run: node scripts/expire.js
